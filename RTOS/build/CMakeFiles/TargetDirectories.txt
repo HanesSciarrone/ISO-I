@@ -1,3 +1,0 @@
-/home/hanes/Documents/ISO-I/RTOS/build/CMakeFiles/rebuild_cache.dir
-/home/hanes/Documents/ISO-I/RTOS/build/CMakeFiles/edit_cache.dir
-/home/hanes/Documents/ISO-I/RTOS/build/CMakeFiles/RTOS.dir
