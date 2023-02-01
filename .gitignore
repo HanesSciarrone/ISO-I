@@ -33,3 +33,4 @@
 
 # Folder
 RTOS/build/*
+RTOS/.cache/*
