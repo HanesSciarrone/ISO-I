@@ -34,3 +34,6 @@
 # Folder
 RTOS/build/*
 RTOS/.cache/*
+gcc-arm-none-eabi/*
+openOCD/*
+Clases/*
