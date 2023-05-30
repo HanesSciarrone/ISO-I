@@ -1,10 +1,14 @@
-/* ------------- Includes ------------- */
+/* ------------------------- Includes ------------------------- */
 #include "main.h"
 #include "stm32f4xx_it.h"
+
+/* -------------------- External variables -------------------- */
+extern TIM_HandleTypeDef htim1;
 
 /******************************************************************************/
 /*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
+
 /**
   * @brief This function handles Non maskable interrupt.
   */
@@ -69,17 +73,18 @@ void DebugMon_Handler(void)
 {
 }
 
-/**
-  * @brief This function handles Pendable request for system service.
-  */
-void PendSV_Handler(void)
-{
-}
+/******************************************************************************/
+/* STM32F4xx Peripheral Interrupt Handlers                                    */
+/* Add here the Interrupt Handlers for the used peripherals.                  */
+/* For the available peripheral interrupt handler names,                      */
+/* please refer to the startup file (startup_stm32f4xx.s).                    */
+/******************************************************************************/
 
 /**
-  * @brief This function handles System tick timer.
+  * @brief This function handles TIM1 update interrupt and TIM10 global interrupt.
   */
-void SysTick_Handler(void)
+void TIM1_UP_TIM10_IRQHandler(void)
 {
-  HAL_IncTick();
+    HAL_TIM_IRQHandler(&htim1);
 }
+

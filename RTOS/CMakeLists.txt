@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(RTOS)
 
 set(PROJECT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/App)
+set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OS)
 
 # Configure preprocessor symbols need to use the HAL library and specifie waht HAL MCU.
 # -------------------------------------------------------------------------------------
@@ -38,6 +39,7 @@ set(HAL_INCLUDE_DERECTORIES
 set(CORE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc)
 
 set(PROJECT_INCLUDE_DIRECTORIES ${PROJECT_DIR}/Inc)
+set(OS_INCLUDE_DIRECTORIES ${OS_DIR}/Inc)
 # -------------------------------------------------------------------------------------
 
 # ------------------------- Configure the source folder paths -------------------------
@@ -48,9 +50,14 @@ file(GLOB_RECURSE CORE_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c)
 file(GLOB_RECURSE APP_SOURCES FOLLOW_SYMLINKS
     ${PROJECT_DIR}/*.c
     ${PROJECT_DIR}/*.cpp)
+
+file(GLOB_RECURSE OS_SOURCES FOLLOW_SYMLINKS
+    ${OS_DIR}/*.s
+    ${OS_DIR}/*.c
+    ${OS_DIR}/*.cpp)
 # -------------------------------------------------------------------------------------
 
-add_executable(${CMAKE_PROJECT_NAME} ${HAL_SOURCES} ${CORE_SOURCES} ${MCU_STARTUP_SCRIPT})
+add_executable(${CMAKE_PROJECT_NAME} ${HAL_SOURCES} ${CORE_SOURCES} ${OS_SOURCES} ${APP_SOURCES} ${MCU_STARTUP_SCRIPT})
 
 # ----------------------------- Embedded Macros (defile). -----------------------------
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
@@ -62,7 +69,8 @@ target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     ${HAL_INCLUDE_DERECTORIES}
     ${CORE_INCLUDE_DIRECTORIES}
-    ${PROJECT_INCLUDE_DIRECTORIES})
+    ${PROJECT_INCLUDE_DIRECTORIES}
+    ${OS_INCLUDE_DIRECTORIES})
 # -------------------------------------------------------------------------------------
 
 

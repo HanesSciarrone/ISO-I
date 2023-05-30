@@ -1,4 +1,4 @@
-/* ------------- Includes ------------- */
+/* ------------------------- Includes ------------------------- */
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -49,7 +49,7 @@ __attribute__((weak)) int _read(int file, char *ptr, int len)
 		*ptr++ = __io_getchar();
 	}
 
-return len;
+    return len;
 }
 
 __attribute__((weak)) int _write(int file, char *ptr, int len)
@@ -60,7 +60,8 @@ __attribute__((weak)) int _write(int file, char *ptr, int len)
 	{
 		__io_putchar(*ptr++);
 	}
-	return len;
+
+    return len;
 }
 
 int _close(int file)
