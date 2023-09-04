@@ -1,4 +1,4 @@
-/* ----------- Define to prevent recursive inclusion ---------- */
+/* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __GPIO_H__
 #define __GPIO_H__
 
@@ -14,5 +14,5 @@ void MX_GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif //__ GPIO_H__
+#endif /*__ GPIO_H__ */
 

@@ -1,4 +1,3 @@
-
 .PHONY: all build cmake clean
 
 BUILD_DIR := build

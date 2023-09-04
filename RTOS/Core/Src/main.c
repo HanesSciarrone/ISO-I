@@ -1,19 +1,21 @@
 /* ------------------------- Includes ------------------------- */
 #include "main.h"
 #include "gpio.h"
-#include "os_core.h"
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_gpio.h"
+
+#include "osKernel.h"
+
+
 /* --------------------- Private variables -------------------- */
-osTaskStruct osTask1;
-osTaskStruct osTask2;
-osTaskStruct osTask3;
+osTaskObject osTask1;
+osTaskObject osTask2;
+osTaskObject osTask3;
 
 /* ---------------- Private function prototypes --------------- */
+
 void SystemClock_Config(void);
-static void ledRedTask(void);
-static void ledGreenTask(void);
-static void ledBlueTask(void);
+static void task1(void);
+static void task2(void);
+static void task3(void);
 
 /**
   * @brief  The application entry point.
@@ -24,6 +26,7 @@ int main(void)
     /* ------------------- MCU Configuration ------------------ */
 
     // Reset of all peripherals, Initializes the Flash interface and the Systick.
+
     HAL_Init();
 
     // Configure the system clock
@@ -32,9 +35,12 @@ int main(void)
     // Initialize all configured peripherals
     MX_GPIO_Init();
 
-    osTaskCreate(&osTask1, ledRedTask);
-    osTaskCreate(&osTask2, ledGreenTask);
-    osTaskCreate(&osTask3, ledBlueTask);
+    osTaskCreate(&osTask1, task1);
+    osTaskCreate(&osTask2, task2);    /* GPIO Ports Clock Enable */
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOH_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    osTaskCreate(&osTask3, task3);
 
     osStart();
 
@@ -53,12 +59,12 @@ void SystemClock_Config(void)
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
-    /* Configure the main internal regulator output voltage */
+    /** Configure the main internal regulator output voltage
+    */
     __HAL_RCC_PWR_CLK_ENABLE();
     __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
-    /*
-    * Initializes the RCC Oscillators according to the specified parameters
+    /** Initializes the RCC Oscillators according to the specified parameters
     * in the RCC_OscInitTypeDef structure.
     */
     RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
@@ -68,15 +74,16 @@ void SystemClock_Config(void)
     RCC_OscInitStruct.PLL.PLLM = 5;
     RCC_OscInitStruct.PLL.PLLN = 180;
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-    RCC_OscInitStruct.PLL.PLLQ = 6;
+    RCC_OscInitStruct.PLL.PLLQ = 7;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
         Error_Handler();
     }
 
-    /* Initializes the CPU, AHB and APB buses clocks */
+    /** Initializes the CPU, AHB and APB buses clocks
+    */
     RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                          |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
     RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
     RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
@@ -110,8 +117,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   */
 void Error_Handler(void)
 {
+    /* User can add his own implementation to report the HAL error return state */
     __disable_irq();
-
     while (1)
     {
     }
@@ -130,39 +137,32 @@ void assert_failed(uint8_t *file, uint32_t line)
 }
 #endif /* USE_FULL_ASSERT */
 
-/* ------------- Private functions implementation ------------- */
-static void ledRedTask(void)
+static void task1(void)
 {
     uint32_t i = 0;
 
     while(1)
     {
-        HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-        HAL_Delay(1500);
         i++;
     }
 }
 
-static void ledGreenTask(void)
+static void task2(void)
 {
     uint32_t j = 0;
 
     while(1)
     {
-        HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-        HAL_Delay(1000);
         j++;
     }
 }
 
-static void ledBlueTask(void)
+static void task3(void)
 {
     uint32_t k = 0;
 
     while(1)
     {
-        HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-        HAL_Delay(500);
         k++;
     }
 }
