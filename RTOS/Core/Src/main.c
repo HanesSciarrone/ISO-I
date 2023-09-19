@@ -9,6 +9,8 @@
 osTaskObject osTask1;
 osTaskObject osTask2;
 osTaskObject osTask3;
+osTaskObject osTask4;
+osTaskObject osTask5;
 
 /* ---------------- Private function prototypes --------------- */
 
@@ -16,6 +18,8 @@ void SystemClock_Config(void);
 static void task1(void);
 static void task2(void);
 static void task3(void);
+static void task4(void);
+static void task5(void);
 
 /**
   * @brief  The application entry point.
@@ -35,9 +39,11 @@ int main(void)
     // Initialize all configured peripherals
     MX_GPIO_Init();
 
-    osTaskCreate(&osTask1, task1);
-    osTaskCreate(&osTask2, task2);    /* GPIO Ports Clock Enable */
-    osTaskCreate(&osTask3, task3);
+    osTaskCreate(&osTask1, OS_VERYHIGH_PRIORITY, task1);
+    osTaskCreate(&osTask2, OS_HIGH_PRIORITY, task2);
+    osTaskCreate(&osTask3, OS_VERYHIGH_PRIORITY, task3);
+    osTaskCreate(&osTask4, OS_VERYHIGH_PRIORITY, task4);
+    osTaskCreate(&osTask5, OS_VERYHIGH_PRIORITY, task5);
 
     osStart();
 
@@ -161,5 +167,25 @@ static void task3(void)
     while(1)
     {
         k++;
+    }
+}
+
+static void task4(void)
+{
+    uint32_t m = 0;
+
+    while(1)
+    {
+        m++;
+    }
+}
+
+static void task5(void)
+{
+    uint32_t n = 0;
+
+    while(1)
+    {
+        n++;
     }
 }

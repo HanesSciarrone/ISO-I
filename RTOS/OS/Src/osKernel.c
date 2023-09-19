@@ -28,7 +28,7 @@ static void scheduler(void);
 
 /* ================= Public functions implementation ================ */
 
-bool osTaskCreate(osTaskObject* handler, void* callback)
+bool osTaskCreate(osTaskObject* handler, osPriorityType priority, void* callback)
 {
     if (osKernel.countTask >= MAX_NUMBER_TASK)
     {
@@ -39,6 +39,8 @@ bool osTaskCreate(osTaskObject* handler, void* callback)
     handler->memory[MAX_STACK_SIZE/4 - XPSR_REG_POSITION]   = XPSR_VALUE;
     // Program pointer (PC) points to function used by the task.
     handler->memory[MAX_STACK_SIZE/4 - PC_REG_POSTION]      = (uint32_t)callback;
+    // If occur some problem and task executed return so after that execute this function.
+    handler->memory[MAX_STACK_SIZE/4 - LR_REG_POSTION]      = (uint32_t)osReturnTaskHook;
 
     /*
      * Previous Link register (LR) value because handler pendSV call function inside exception
@@ -49,6 +51,8 @@ bool osTaskCreate(osTaskObject* handler, void* callback)
     // Pointer function of task.
     handler->entryPoint     = callback;
     handler->id             = osKernel.countTask;
+    handler->state          = OS_TASK_READY;
+    handler->priority       = priority;
     handler->stackPointer   = (uint32_t)(handler->memory + MAX_STACK_SIZE/4 - SIZE_STACK_FRAME);
 
     // Fill controls OS structure
@@ -88,6 +92,38 @@ void osStart(void)
     NVIC_EnableIRQ(SysTick_IRQn);
 }
 
+void osDelay(const uint32_t tick)
+{
+    (void)tick;
+}
+
+__attribute__((weak)) void osReturnTaskHook(void)
+{
+    while(1)
+    {
+        __WFI();
+    }
+}
+
+__attribute__((weak)) void osSysTickHook(void)
+{
+    __ASM volatile ("nop");
+}
+
+__attribute__((weak)) void osErrorHook(void* caller)
+{
+    while(1)
+    {
+    }
+}
+
+__attribute__((weak)) void osIdleTask(void)
+{
+    while(1)
+    {
+    }
+}
+
 /* ================ Private functions implementation ================ */
 
 /**
@@ -102,18 +138,18 @@ static uint32_t getNextContext(uint32_t currentStaskPointer)
      // Is the first time execute operating system? Yes, so will do task charged on next task.
     if (!osKernel.running)
     {
-        osKernel.currentTask->status    = OS_TASK_RUNNING;
-        osKernel.running                = true;
+        osKernel.currentTask->state = OS_TASK_RUNNING;
+        osKernel.running            = true;
     }
     else
     {
         // Storage last stack pointer used on current task and change state to ready.
         osKernel.currentTask->stackPointer  = currentStaskPointer;
-        osKernel.currentTask->status        = OS_TASK_READY;
+        osKernel.currentTask->state         = OS_TASK_READY;
 
         // Switch address memory points on current task for next task and change state of task
         osKernel.currentTask            = osKernel.nextTask;
-        osKernel.currentTask->status    = OS_TASK_RUNNING;
+        osKernel.currentTask->state     = OS_TASK_RUNNING;
     }
 
     return osKernel.currentTask->stackPointer;
@@ -151,6 +187,7 @@ static void scheduler(void)
 void SysTick_Handler(void)
 {
     scheduler();
+    osSysTickHook();
 
     /*
      * Set up bit corresponding exception PendSV
