@@ -173,6 +173,19 @@ void SysTick_Handler(void)
 __attribute__ ((naked)) void PendSV_Handler(void)
 {
     /**
+     * Implementación de stacking para FPU:
+     *
+     * Las tres primeras corresponden a un testeo del bit EXEC_RETURN[4]. La instruccion TST hace un
+     * AND estilo bitwise (bit a bit) entre el registro LR y el literal inmediato. El resultado de esta
+     * operacion no se guarda y los bits N y Z son actualizados. En este caso, si el bit EXEC_RETURN[4] = 0
+     * el resultado de la operacion sera cero, y la bandera Z = 1, por lo que se da la condicion EQ y
+     * se hace el push de los registros de FPU restantes
+     */
+    __ASM volatile ("tst lr, 0x10");
+    __ASM volatile ("it eq");
+    __ASM volatile ("vpusheq {s16-s31}");
+
+    /**
      * Cuando se ingresa al handler de PendSV lo primero que se ejecuta es un push para
 	 * guardar los registros R4-R11 y el valor de LR, que en este punto es EXEC_RETURN
 	 * El push se hace al reves de como se escribe en la instruccion, por lo que LR
@@ -190,6 +203,17 @@ __attribute__ ((naked)) void PendSV_Handler(void)
     __ASM volatile ("bl %0" :: "i"(getNextContext));
     __ASM volatile ("msr msp, r0");
     __ASM volatile ("pop {r4-r11, lr}");    //Recuperados todos los valores de registros
+
+    /**
+     * Implementación de unstacking para FPU:
+     *
+     * Habiendo hecho el cambio de contexto y recuperado los valores de los registros, es necesario
+     * determinar si el contexto tiene guardados registros correspondientes a la FPU. si este es el caso
+     * se hace el unstacking de los que se hizo PUSH manualmente.
+     */
+    __ASM volatile ("tst lr,0x10");
+    __ASM volatile ("it eq");
+    __ASM volatile ("vpopeq {s16-s31}");
 
     /* Se hace un branch indirect con el valor de LR que es nuevamente EXEC_RETURN */
     __ASM volatile ("bx lr");
