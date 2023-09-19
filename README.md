@@ -49,10 +49,12 @@ Para poder hacer debugging de la aplicación es necesario primero ejecutar OpenO
 arm-none-eabi-gdb RTOS/build/RTOS.elf
 ```
 
-3. Dentro de la sesión de GDB debemos conectarnos con OpenOCD para hacer el debugging.
+3. Dentro de la sesión de GDB debemos conectarnos con OpenOCD para hacer el debugging y generar un reset y luego cagar el programa nuevamente.
 
 ```
 target extended-remote localhost:${OpenOCD_port}
+monitor reset halt
+load
 ```
 
 
