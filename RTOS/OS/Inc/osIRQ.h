@@ -8,7 +8,7 @@
 #endif
 
 #ifdef LPC4337
-#icnlude "lpc4337.h"
+#include "lpc4337.h"
 #endif
 
 
