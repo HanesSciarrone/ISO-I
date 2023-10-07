@@ -10,6 +10,7 @@ set(OS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/OS)
 set(MCU_FAMILY STM32F4xx)
 set(MCU_MODEL STM32F429xx)
 set(HAL_DRIVER USE_HAL_DRIVER)
+set(OS_MCU_PORTING STM32F429)
 # -------------------------------------------------------------------------------------
 
 # ---------------- Flags used to setup parameters of specific hardware ----------------
@@ -39,7 +40,9 @@ set(HAL_INCLUDE_DERECTORIES
 set(CORE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/Core/Inc)
 
 set(PROJECT_INCLUDE_DIRECTORIES ${PROJECT_DIR}/Inc)
-set(OS_INCLUDE_DIRECTORIES ${OS_DIR}/Inc)
+set(OS_INCLUDE_DIRECTORIES
+    ${OS_DIR}/Inc
+    ${OS_DIR}/Inc/Port)
 # -------------------------------------------------------------------------------------
 
 # ------------------------- Configure the source folder paths -------------------------
@@ -54,6 +57,7 @@ file(GLOB_RECURSE APP_SOURCES FOLLOW_SYMLINKS
 file(GLOB_RECURSE OS_SOURCES FOLLOW_SYMLINKS
     ${OS_DIR}/*.s
     ${OS_DIR}/*.c
+    ${OS_DIR}/Port/*.c
     ${OS_DIR}/*.cpp)
 # -------------------------------------------------------------------------------------
 
@@ -62,7 +66,8 @@ add_executable(${CMAKE_PROJECT_NAME} ${HAL_SOURCES} ${CORE_SOURCES} ${OS_SOURCES
 # ----------------------------- Embedded Macros (defile). -----------------------------
 target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
     ${MCU_MODEL}
-    ${HAL_DRIVER})
+    ${HAL_DRIVER}
+    ${OS_MCU_PORTING})
 # -------------------------------------------------------------------------------------
 
 # --------------------------------- Header directories --------------------------------

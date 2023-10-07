@@ -209,6 +209,9 @@ void SysTick_Handler(void)
 
 __attribute__ ((naked)) void PendSV_Handler(void)
 {
+    // Se entra a la seccion critica y se deshabilita las interrupciones.
+	__ASM volatile ("cpsid i");
+
     /**
      * Implementación de stacking para FPU:
      *
@@ -251,6 +254,9 @@ __attribute__ ((naked)) void PendSV_Handler(void)
     __ASM volatile ("tst lr,0x10");
     __ASM volatile ("it eq");
     __ASM volatile ("vpopeq {s16-s31}");
+
+    // Se sale de la seccion critica y se habilita las interrupciones.
+	__ASM volatile ("cpsie i");
 
     /* Se hace un branch indirect con el valor de LR que es nuevamente EXEC_RETURN */
     __ASM volatile ("bx lr");

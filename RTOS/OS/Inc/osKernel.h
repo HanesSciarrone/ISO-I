@@ -83,6 +83,16 @@ void osStart(void);
 void osDelay(const uint32_t tick);
 
 /**
+ * @brief Declare the end of the critical section.
+ */
+void osEnterCriticalSection(void);
+
+/**
+ * @brief Declare the beginning of the critical section.
+ */
+void osExitCriticalSection(void);
+
+/**
  * @brief Function used as default when some task return for a problem.
  */
 void osReturnTaskHook(void);
